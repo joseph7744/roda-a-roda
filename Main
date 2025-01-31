@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <ctype.h>
+
+typedef struct
+{
+    char       pista[16+1];
+    int               qtd;
+    char palavras[3][16+1];
+}
+registro;
+
+typedef struct
+{
+    float premio;
+}
+regpremio;
+
+registro  reg;
+FILE     *Arq;
+char      opc;
+
+void cadastrarPremios(void)
+{
+    regpremio rpr[12] = {
+	 100.00 ,
+     900.00 ,
+     600.00 ,
+    1000.00 ,
+       0.00 ,
+     400.00 ,
+     200.00 ,
+     800.00 ,
+       0.01 ,
+     300.00 ,
+     500.00 ,
+     700.00
+    };
+
+    Arq = fopen("PREMIOS.DAT", "w+b");
+    if (Arq == NULL) {
+        printf("Erro ao criar PREMIOS.DAT\n");
+        getch();
+        exit(0);
+    }
+
+    fwrite ( &rpr, sizeof (rpr), 1, Arq);
+	  if ( ferror(Arq) )
+	  {
+		    printf ("\nERRO AO GRAVAR EM PREMIOS.DAT");
+		    getch();
+		    exit(0);
+	  }
+    fclose(Arq);
+    printf("\nArquivo PREMIOS.DAT criado com sucesso!")
+    getch();
+  }
+
+void MostraPremios(void)
+{
+
+    regpremio rpr;
+
+    Arq = fopen("PREMIOS.DAT", "r+b");
+    if(Arq == NULL)
+    {
+        printf("\ERRO AO ABRIR PREMIOS.DAT");
+        getch();
+        exit(0);
+    }
+    system("cls");
+    printf("\n------PRÊMIOS------");
+    while(!feof(Arq))
+    {
+        fread (&rpr, sizeof (rpr, 1, Arq));
+        if(ferror(Arq))
+        {
+            printf("\ERRO AO LER PREMIOS.DAT");
+            getch();
+            exit(0);
+        }
+        if(!feof(Arq))
+        {
+            printf("\n\tR$ %10.2f", rpr.premios);
+        }
+    }
+    fclose(Arq);
+    printf("\n-------------------")
+    getch();
+}
+
+void LimpaReg(void)
+{
+    strcpy(reg.pista, "");
+    reg.qtd = 0;
+    strcpy(reg.palavras[0],"");
+    strcpy(reg.palavras[1],"");
+    strcpy(reg.palavras[2],"");
+}
+
+void capturaDados(void)
+{
+    int i;
+    LimpaReg();
+}
+
+void cadastrarPalavras(void)
+{
+    registro psta[5] = {
+        "vegetal",
+        "Automóvel",
+        "Cozinha",
+        "Réptil",
+        "Mamifero"
+    };
+    gets(reg.pista);
+
+    registro qtd[5] = {
+        2,
+        3,
+        3,
+        1,
+        2
+    };
+    gets(reg.qtd);
+
+    registro[3][5] = {
+        {"Acelga","Alface"},
+        {"Motor","Embreagem","Escapamento"},
+        {"Prato","Panela","Fogao"},
+        {"Jararaca"},
+        {"Baleia","Macaco"}
+    };
+    gets(reg.palavras);
+
+    ARQ = fopen("PALAVRAS.DAT","w+b");
+    if(reg == NULL)
+    {
+        printf("\nERRO AO CRIAR PALAVRAS.DAT");
+        getch();
+        exit(0);
+    }
+    fwrite(&reg, sizeof(reg),1, Arq);
+    if(ferror(Arq))
+}
+ 
