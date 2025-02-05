@@ -4,6 +4,7 @@
 #include <time.h>
 #include <ctype.h>
 
+// Estruturas para armazenar palavras e prêmios
 typedef struct
 {
     char       pista[16+1];
@@ -46,17 +47,19 @@ void cadastrarPremios(void)
         exit(0);
     }
 
+    // Lê o número de prêmios
     fwrite ( &rpr, sizeof (rpr), 1, Arq);
-	  if ( ferror(Arq) )
-	  {
-		    printf ("\nERRO AO GRAVAR EM PREMIOS.DAT");
-		    getch();
-		    exit(0);
-	  }
+	if ( ferror(Arq) )
+	{
+		printf ("\nERRO AO GRAVAR EM PREMIOS.DAT");
+		getch();
+		exit(0);
+	}
     fclose(Arq);
+    // Lê os prêmios
     printf("\nArquivo PREMIOS.DAT criado com sucesso!")
     getch();
-  }
+}
 
 void MostraPremios(void)
 {
@@ -108,41 +111,44 @@ void capturaDados(void)
 
 void cadastrarPalavras(void)
 {
-    registro psta[5] = {
+    char pistas[5][pista] = {
         "vegetal",
-        "Automóvel",
-        "Cozinha",
+        "automovel", 
+        "cozinha",
         "Réptil",
-        "Mamifero"
+        "Mamífero"};
+        
+    int quantidades[5] = {
+        2, 3, 3, 1, 2};
+        
+    char plvrs[3][5][palavras] = {
+        {"ACELGA", "ALFACE", ""},       
+        {"MOTOR", "EMBREAGEM", "ESCAPAMENTO"},      
+        {"PRATO", "PANELA", "FOGÃO"},
+        {"JARARACA","",""},     
+        {"BALEIA","MACACO",""}
     };
-    gets(reg.pista);
-
-    registro qtd[5] = {
-        2,
-        3,
-        3,
-        1,
-        2
-    };
-    gets(reg.qtd);
-
-    registro[3][5] = {
-        {"Acelga","Alface"},
-        {"Motor","Embreagem","Escapamento"},
-        {"Prato","Panela","Fogao"},
-        {"Jararaca"},
-        {"Baleia","Macaco"}
-    };
-    gets(reg.palavras);
-
-    ARQ = fopen("PALAVRAS.DAT","w+b");
-    if(reg == NULL)
-    {
-        printf("\nERRO AO CRIAR PALAVRAS.DAT");
+    
+    Arq = fopen("PALAVRAS.DAT", "w+b");
+    if (Arq == NULL) {
+        printf("Erro ao criar PALAVRAS.DAT\n");
         getch();
         exit(0);
     }
-    fwrite(&reg, sizeof(reg),1, Arq);
-    if(ferror(Arq))
+    
+    for (int i = 0; i < 3; i++) {
+        // Escrevendo a pista no arquivo
+        fwrite(pistas[i], sizeof(char), pistas, Arq);
+
+        // Escrevendo a quantidade de palavras
+        fwrite(&quantidades[i], sizeof(int), 1, Arq);
+
+        // Escrevendo as palavras
+        fwrite(plvrs[i], sizeof(char), quantidades[i] * palavras, Arq);
+    }
+    
+    fclose(arquivo);
+    
+    printf("Arquivo PALAVRAS.DAT criado com sucesso!\n");
+    
 }
- 
