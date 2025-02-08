@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #define MAX_PLAYERS 3
+#define MAX_PALAVRA 17
 
 // Estruturas para armazenar palavras e prêmios
 typedef struct
@@ -87,7 +88,7 @@ void MostraPremios(void)
     printf("\n------PRÊMIOS------");
     while(!feof(Arq))
     {
-        fread (&rpr, sizeof (rpr, 1, Arq));
+        fread (&rpr, sizeof (rpr), 1, Arq);
         if(ferror(Arq))
         {
             printf("\ERRO AO LER PREMIOS.DAT");
@@ -96,7 +97,7 @@ void MostraPremios(void)
         }
         if(!feof(Arq))
         {
-            printf("\n\tR$ %10.2f", rpr.premios);
+            printf("\n\tR$ %10.2f", rpr.premio);
         }
     }
     fclose(Arq);
@@ -139,7 +140,7 @@ void cadastrarPalavras(void)
         fwrite(&quantidades[i], sizeof(int), 1, Arq);
 
         // Escrevendo as palavras
-        fwrite(plvrs[i], sizeof(char), quantidades[i] * palavras, Arq);
+        fwrite(plvrs[i], sizeof(char), quantidades[i] * MAX_PALAVRA, Arq);
     }
 
     fclose(Arq);
@@ -155,7 +156,7 @@ int main(){
     ler_palavras(&registro);
     ler_premios(premios);
 
-    jogar (&registro, premios);
+    jogar(&registro, premios);
 
     return 0;
 }
@@ -216,7 +217,7 @@ int verificar_palavra(char palavra[], char letra){
     return encontrado;
 }
 
-void jogar(Registro* registro, Regpremio* premios){
+void jogar(Registro* registro, Regpremio* premio){
     float saldo[MAX_PLAYERS] = {0};
     int jogador_atual = 0;
 
@@ -229,8 +230,8 @@ void jogar(Registro* registro, Regpremio* premios){
     while (1){
         printf("\nJogador %d, é sua vez!\n", jogador_atual + 1);
 
-        int premio_index = sortear_premio(premios);
-        float premio = premios[premio_index].premio;
+        int premio_index = sortear_premio(premio);
+        float premio = premio[premio_index].premios;
 
         printf("Você ganhou um prêmio de R$ %.2f por letra correta!\n", premio);
 
