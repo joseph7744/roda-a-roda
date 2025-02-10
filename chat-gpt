@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
+#include <windows.h>
 
 #define MAX_PLAYERS 3
 #define MAX_PALAVRA 17
@@ -28,7 +29,7 @@ int sortear_premio(Regpremio* premios);
 void mostrar_palavra(char palavra[], int tamanho);
 int verificar_palavra(char palavra[], char letra);
 
-void jogar(Registro* registro, Regpremio premios);
+void jogar(Registro* registro, Regpremio* premios);
 
 Registro  reg;
 FILE     *Arq;
@@ -54,7 +55,7 @@ void cadastrarPremios(void)
     Arq = fopen("PREMIOS.DAT", "w+b");
     if (Arq == NULL) {
         printf("Erro ao criar PREMIOS.DAT\n");
-        getch();
+        getchar();
         exit(0);
     }
 
@@ -63,13 +64,13 @@ void cadastrarPremios(void)
 	if ( ferror(Arq) )
 	{
 		printf ("\nERRO AO GRAVAR EM PREMIOS.DAT");
-		getch();
+		getchar();
 		exit(0);
 	}
     fclose(Arq);
     // Lê os prêmios
     printf("\nArquivo PREMIOS.DAT criado com sucesso!");
-    getch();
+    getchar();
 }
 
 void MostraPremios(void)
@@ -81,7 +82,7 @@ void MostraPremios(void)
     if(Arq == NULL)
     {
         printf("\ERRO AO ABRIR PREMIOS.DAT");
-        getch();
+        getchar();
         exit(0);
     }
     system("cls");
@@ -92,7 +93,7 @@ void MostraPremios(void)
         if(ferror(Arq))
         {
             printf("\ERRO AO LER PREMIOS.DAT");
-            getch();
+            getchar();
             exit(0);
         }
         if(!feof(Arq))
@@ -102,7 +103,7 @@ void MostraPremios(void)
     }
     fclose(Arq);
     printf("\n-------------------");
-    getch();
+    getchar();
 }
 
 void cadastrarPalavras(void)
@@ -171,7 +172,7 @@ void ler_palavras(Registro* registro){
         exit(0);
     }
 
-    fscanf(Arq, "%[\n]", registro->pista);
+    fgets(Arq, "%[\n]", registro->pista);
     fscanf(Arq, "%d", &registro->num_palavras);
 
     for(int i = 0; i< registro ->num_palavras; i++){
@@ -239,7 +240,7 @@ void jogar(Registro* registro, Regpremio* premios){
         int premio_index = sortear_premio(premios);
         float valor_premio = premios[premio_index].premio;
 
-        printf("Você ganhou um prêmio de R$ %.2f por letra correta!\n", valor_premio);
+        printf("Você ganhou um prêmio de R$ %.2f por letra correta!\n", premios[sorteado].premio);
 
         char letra;
         printf("Digite uma letra: ");
