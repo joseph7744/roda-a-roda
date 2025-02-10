@@ -128,19 +128,21 @@ void cadastrarPalavras(void)
     Arq = fopen("PALAVRAS.DAT", "w+b");
     if (Arq == NULL) {
         printf("Erro ao criar PALAVRAS.DAT\n");
-        getch();
+        getchar();
         exit(0);
     }
 
     for (int i = 0; i < 3; i++) {
         // Escrevendo a pista no arquivo
-        fwrite(pistas[i], sizeof(char), pistas, Arq);
+        fwrite(pistas[i], sizeof(char), strlen(pistas[i]), Arq);
 
         // Escrevendo a quantidade de palavras
         fwrite(&quantidades[i], sizeof(int), 1, Arq);
 
         // Escrevendo as palavras
-        fwrite(plvrs[i], sizeof(char), quantidades[i] * MAX_PALAVRA, Arq);
+        for(int j = 0; j < quantidades[i];j++){
+            fwrite(plvrs[i][j], sizeof(char), strlen(plvrs[i][j])+1, Arq);
+        }
     }
 
     fclose(Arq);
@@ -169,7 +171,7 @@ void ler_palavras(Registro* registro){
         exit(0);
     }
 
-    fscanf(Arq, "%[\n]", registro>pista);
+    fscanf(Arq, "%[\n]", registro->pista);
     fscanf(Arq, "%d", &registro->num_palavras);
 
     for(int i = 0; i< registro ->num_palavras; i++){
@@ -201,7 +203,11 @@ int sortear_premio(Regpremio* premios){
 
 void mostrar_palavra(char palavra[], int tamanho){
     for(int i = 0; i < tamanho; i++){
-        printf("_ ");
+        if(palavra[i] != '_'){
+            printf("%c ", palavra[i]);
+        }else{
+            printf("_ ");
+        }
     }
     printf("\n");
 }
@@ -217,7 +223,7 @@ int verificar_palavra(char palavra[], char letra){
     return encontrado;
 }
 
-void jogar(Registro* registro, Regpremio* premio){
+void jogar(Registro* registro, Regpremio* premios){
     float saldo[MAX_PLAYERS] = {0};
     int jogador_atual = 0;
 
@@ -230,10 +236,10 @@ void jogar(Registro* registro, Regpremio* premio){
     while (1){
         printf("\nJogador %d, é sua vez!\n", jogador_atual + 1);
 
-        int premio_index = sortear_premio(premio);
-        float premio = premio[premio_index].premios;
+        int premio_index = sortear_premio(premios);
+        float valor_premio = premios[premio_index].premio;
 
-        printf("Você ganhou um prêmio de R$ %.2f por letra correta!\n", premio);
+        printf("Você ganhou um prêmio de R$ %.2f por letra correta!\n", valor_premio);
 
         char letra;
         printf("Digite uma letra: ");
@@ -244,7 +250,7 @@ void jogar(Registro* registro, Regpremio* premio){
         for (int i = 0; i < registro-> num_palavras; i++){
             if(verificar_palavra(registro->palavras[i], letra)){
                 printf("Acertou a letra %c!\n", letra);
-                saldo[jogador_atual] += premio;
+                saldo[jogador_atual] += valor_premio;
                 acertou = 1;
             }
         }
@@ -254,9 +260,11 @@ void jogar(Registro* registro, Regpremio* premio){
         }
 
         int letras_restantes = 0;
-        for(int i = 0; i< registro->num_palavras; i++){
+        for(int i = 0; i < registro->num_palavras; i++){
             for(int j = 0; registro->palavras[i][j] != '\0'; j++){
-                letras_restantes++;
+                if(registro->palavras[i][j] != '_'){
+                    letras_restantes++;
+                }
             }
         }
 
@@ -264,7 +272,7 @@ void jogar(Registro* registro, Regpremio* premio){
             printf("Faltam 3 ou menos letras, agora você deve tentar adivinhar as palavras!\n");
             for (int i = 5; i > 0; i--){
                 printf("%d...\n", i);
-                sleep(1);
+                Sleep(1000);
             }
 
             char tentativa[16+1];
@@ -280,7 +288,7 @@ void jogar(Registro* registro, Regpremio* premio){
             }
 
             if(acertou_tudo){
-                saldo[jogador_atual] += premio;
+                saldo[jogador_atual] += valor_premio;
                 printf("Parabéns, você acertou todas as palavras! Você ganhou R$ %.2f.\n", saldo[jogador_atual]);
                 break;
             }else{
