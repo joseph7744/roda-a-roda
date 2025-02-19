@@ -8,7 +8,7 @@
 #define MAX_PLAYERS 3
 #define MAX_PALAVRA 17
 
-// Estruturas para armazenar palavras e prêmios
+// Estruturas para armazenar palavras e pr�mios
 typedef struct
 {
     char       pista[16+1];
@@ -59,7 +59,6 @@ void cadastrarPremios(void)
         exit(0);
     }
 
-    // Lê o número de prêmios
     fwrite ( &rpr, sizeof (rpr), 1, Arq);
 	if ( ferror(Arq) )
 	{
@@ -68,7 +67,6 @@ void cadastrarPremios(void)
 		exit(0);
 	}
     fclose(Arq);
-    // Lê os prêmios
     printf("\nArquivo PREMIOS.DAT criado com sucesso!");
     getchar();
 }
@@ -81,18 +79,18 @@ void MostraPremios(void)
     Arq = fopen("PREMIOS.DAT", "r+b");
     if(Arq == NULL)
     {
-        printf("\ERRO AO ABRIR PREMIOS.DAT");
+        printf("\nERRO AO ABRIR PREMIOS.DAT");
         getchar();
         exit(0);
     }
     system("cls");
-    printf("\n------PRÊMIOS------");
+    printf("\n------PREMIOS------");
     while(!feof(Arq))
     {
         fread (&rpr, sizeof (rpr), 1, Arq);
         if(ferror(Arq))
         {
-            printf("\ERRO AO LER PREMIOS.DAT");
+            printf("\nERRO AO LER PREMIOS.DAT");
             getchar();
             exit(0);
         }
@@ -112,16 +110,16 @@ void cadastrarPalavras(void)
         "vegetal",
         "automovel",
         "cozinha",
-        "Réptil",
-        "Mamífero"};
+        "Reptil",
+        "Mamifero"};
 
     int quantidades[5] = {
         2, 3, 3, 1, 2};
 
-    char plvrs[3][5][16+1] = {
+    char plvrs[5][3][16+1] = {
         {"ACELGA", "ALFACE", ""},
         {"MOTOR", "EMBREAGEM", "ESCAPAMENTO"},
-        {"PRATO", "PANELA", "FOGÃO"},
+        {"PRATO", "PANELA", "FOGAO"},
         {"JARARACA","",""},
         {"BALEIA","MACACO",""}
     };
@@ -167,15 +165,15 @@ int main(){
 
 void ler_palavras(Registro* registro){
     Arq = fopen("PALAVRAS.DAT", "r");
-    if(!Arq){
+    if(Arq == NULL){
         printf("Erro ao abrir o arquivo PALAVRAS.DAT");
         exit(0);
     }
 
-    fgets(Arq, "%[\n]", registro->pista);
+    fgets(registro->pista, sizeof(registro->pista), Arq);
     fscanf(Arq, "%d", &registro->num_palavras);
 
-    for(int i = 0; i< registro ->num_palavras; i++){
+    for(int i = 0; i < registro ->num_palavras; i++){
         fscanf(Arq, "%s", registro -> palavras[i]);
     }
 
@@ -240,7 +238,7 @@ void jogar(Registro* registro, Regpremio* premios){
         int premio_index = sortear_premio(premios);
         float valor_premio = premios[premio_index].premio;
 
-        printf("Você ganhou um prêmio de R$ %.2f por letra correta!\n", premios[sorteado].premio);
+        printf("Você ganhou um prêmio de R$ %.2f por letra correta!\n", valor_premio);
 
         char letra;
         printf("Digite uma letra: ");
@@ -257,7 +255,7 @@ void jogar(Registro* registro, Regpremio* premios){
         }
 
         if(!acertou){
-            printf("A letra %c não está na palavra.\n", letra);
+            printf("A letra %c nao esta na palavra.\n", letra);
         }
 
         int letras_restantes = 0;
@@ -270,7 +268,7 @@ void jogar(Registro* registro, Regpremio* premios){
         }
 
         if(letras_restantes <= 3){
-            printf("Faltam 3 ou menos letras, agora você deve tentar adivinhar as palavras!\n");
+            printf("Faltam 3 ou menos letras, agora voc� deve tentar adivinhar as palavras!\n");
             for (int i = 5; i > 0; i--){
                 printf("%d...\n", i);
                 Sleep(1000);
@@ -290,10 +288,10 @@ void jogar(Registro* registro, Regpremio* premios){
 
             if(acertou_tudo){
                 saldo[jogador_atual] += valor_premio;
-                printf("Parabéns, você acertou todas as palavras! Você ganhou R$ %.2f.\n", saldo[jogador_atual]);
+                printf("Parab�ns, voc� acertou todas as palavras! Voc� ganhou R$ %.2f.\n", saldo[jogador_atual]);
                 break;
             }else{
-                printf("Resposta errada! A vez passou para o próximo jogador.\n");
+                printf("Resposta errada! A vez passou para o pr�ximo jogador.\n");
             }
         }
 
@@ -308,5 +306,5 @@ void jogar(Registro* registro, Regpremio* premios){
         }
     }
 
-    printf("O vencedor é o Jogador %d com R$ %.2f.\n", vencedor + 1, saldo[vencedor]);
+    printf("O vencedor � o Jogador %d com R$ %.2f.\n", vencedor + 1, saldo[vencedor]);
 }
