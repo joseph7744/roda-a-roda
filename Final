@@ -1,0 +1,167 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <ctype.h>
+#include <unistd.h>
+#define MAX_PLAYERS 3
+#define MAX_PALAVRA 17
+
+typedef struct {
+    char pista[17];
+    int num_palavras;
+    char palavras[3][17];
+} Registro;
+
+typedef struct {
+    float premio;
+} Regpremio;
+
+void cadastrarPalavras(void) {
+    FILE *Arq = fopen("PALAVRAS.DAT", "wb");
+    if (Arq == NULL) {
+        printf("Erro ao criar PALAVRAS.DAT\n");
+        exit(1);
+    }
+
+    Registro registros[5] = {
+        {"Vegetal", 2, {"ACELGA", "ALFACE"}},
+        {"Automovel", 3, {"MOTOR", "EMBREAGEM", "ESCAPAMENTO"}},
+        {"Cozinha", 3, {"PRATO", "PANELA", "FOGAO"}},
+        {"Reptil", 1, {"JARARACA"}},
+        {"Mamifero", 2, {"BALEIA", "MACACO"}}
+    };
+
+    for (int i = 0; i < 5; i++) {
+        fwrite(&registros[i], sizeof(Registro), 1, Arq);
+    }
+
+    fclose(Arq);
+    printf("Arquivo PALAVRAS.DAT criado com sucesso!\n");
+}
+
+void cadastrarPremios(void) {
+    FILE *Arq = fopen("PREMIOS.DAT", "wb");
+    if (Arq == NULL) {
+        printf("Erro ao criar PREMIOS.DAT\n");
+        exit(1);
+    }
+
+    Regpremio premios[5] = {{200.0}, {200.0}, {200.0}, {200.0}, {200.0}};
+
+    fwrite(premios, sizeof(Regpremio), 5, Arq);
+    fclose(Arq);
+}
+
+void ler_palavras(Registro* registro);
+void ler_premios(Regpremio* premios);
+void jogar(Registro* registro, Regpremio* premios);
+int verificar_letra(char palavra[], char letra, char exibicao[]);
+
+int main() {
+    cadastrarPalavras();
+    cadastrarPremios();
+
+    Registro registro;
+    Regpremio premios[5];
+
+    ler_palavras(&registro);
+    ler_premios(premios);
+
+    jogar(&registro, premios);
+    return 0;
+}
+
+void ler_palavras(Registro* registro) {
+    FILE *Arq = fopen("PALAVRAS.DAT", "rb");
+    if (Arq == NULL) {
+        printf("Erro ao abrir o arquivo PALAVRAS.DAT\n");
+        exit(1);
+    }
+
+    fread(registro, sizeof(Registro), 1, Arq);
+    fclose(Arq);
+}
+
+void ler_premios(Regpremio* premios) {
+    FILE *Arq = fopen("PREMIOS.DAT", "rb");
+    if (Arq == NULL) {
+        printf("Erro ao abrir o arquivo PREMIOS.DAT\n");
+        exit(1);
+    }
+
+    fread(premios, sizeof(Regpremio), 5, Arq);
+    fclose(Arq);
+}
+
+void mostrar_palavra(char palavra[], int tamanho, char exibicao[]) {
+    for (int i = 0; i < tamanho; i++) {
+        printf("%c ", exibicao[i]);
+    }
+    printf("\n");
+}
+
+int verificar_letra(char palavra[], char letra, char exibicao[]) {
+    int encontrado = 0;
+    for (int i = 0; palavra[i] != '\0'; i++) {
+        if (toupper(palavra[i]) == toupper(letra)) {
+            exibicao[i] = palavra[i];
+            encontrado++;
+        }
+    }
+    return encontrado;
+}
+
+void jogar(Registro* registro, Regpremio* premios) {
+    float saldo[MAX_PLAYERS] = {0};
+    int jogador_atual = 0;
+    char exibicao[MAX_PALAVRA];
+    char usadas[26] = {0};
+    int usadas_count = 0;
+
+    printf("Pista: %s\n", registro->pista);
+    
+    strcpy(exibicao, registro->palavras[0]);
+    for (int i = 0; exibicao[i] != '\0'; i++) {
+        exibicao[i] = '_';
+    }
+
+    while (1) {
+        printf("\nJogador %d, é sua vez!\n", jogador_atual + 1);
+        mostrar_palavra(registro->palavras[0], strlen(registro->palavras[0]), exibicao);
+
+        char letra;
+        printf("Digite uma letra: ");
+        scanf(" %c", &letra);
+        letra = toupper(letra);
+
+        int repetida = 0;
+        for (int i = 0; i < usadas_count; i++) {
+            if (usadas[i] == letra) {
+                repetida = 1;
+                break;
+            }
+        }
+
+        if (repetida) {
+            printf("A letra %c já foi usada!\n", letra);
+        } else {
+            usadas[usadas_count++] = letra;
+            int ocorrencias = verificar_letra(registro->palavras[0], letra, exibicao);
+            if (ocorrencias > 0) {
+                printf("Acertou! A letra %c aparece %d vezes. Você ganhou R$%.2f!\n", letra, ocorrencias, ocorrencias * 200.0);
+                saldo[jogador_atual] += ocorrencias * 200.0;
+            } else {
+                printf("A letra %c não está na palavra.\n", letra);
+            }
+        }
+
+        if (strcmp(exibicao, registro->palavras[0]) == 0) {
+            printf("\nParabéns, você acertou a palavra: %s!\n", registro->palavras[0]);
+            printf("Jogador %d ganhou R$%.2f!\n", jogador_atual + 1, saldo[jogador_atual]);
+            break;
+        }
+
+        jogador_atual = (jogador_atual + 1) % MAX_PLAYERS;
+    }
+}
