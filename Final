@@ -122,7 +122,8 @@ void jogar(Registro* registro, Regpremio* premios) {
     int usadas_count = 0;
     
     
-    printf("Pista: %s\n", registro->pista);
+    printf("A palavra esta associada com: %s\n", registro->pista);
+
 
     strcpy(exibicao, registro->palavras[1]);
     for (int i = 0; exibicao[i] != '\0'; i++) {
@@ -130,7 +131,10 @@ void jogar(Registro* registro, Regpremio* premios) {
     }
 
     while (1) {
-        printf("\nJogador %d, é sua vez!\n", jogador_atual + 1);
+        printf("\nJogador 1         Jogador 2         Jogador 3");
+        printf("\n=========         =========         =========");
+        printf("\nR$%.2f            R$%.2f            R$%.2f", saldo[0], saldo[1], saldo[2]);
+        printf("\n\nVez do jogador %d!\n", jogador_atual + 1);
         mostrar_palavra(registro->palavras[1], strlen(registro->palavras[1]), exibicao);
 
         char letra;
@@ -147,24 +151,34 @@ void jogar(Registro* registro, Regpremio* premios) {
         }
 
         if (repetida) {
-            printf("A letra %c já foi usada!\n", letra);
+            printf("A letra %c ja foi usada!\n", letra);
         } else {
             usadas[usadas_count++] = letra;
             int ocorrencias = verificar_letra(registro->palavras[0], letra, exibicao);
             if (ocorrencias > 0) {
-                printf("Acertou! A letra %c aparece %d vezes. Você ganhou R$%.2f!\n", letra, ocorrencias, ocorrencias * 200.0);
+                printf("Acertou! A letra %c aparece %d vezes. Voce ganhou R$%.2f!\n", letra, ocorrencias, ocorrencias * 200.0);
                 saldo[jogador_atual] += ocorrencias * 200.0;
             } else {
-                printf("A letra %c não está na palavra.\n", letra);
+                printf("A letra %c nao esta na palavra.\n", letra);
             }
         }
+        
 
         if (strcmp(exibicao, registro->palavras[0]) == 0) {
-            printf("\nParabéns, você acertou a palavra: %s!\n", registro->palavras[0]);
-            printf("Jogador %d ganhou R$%.2f!\n", jogador_atual + 1, saldo[jogador_atual]);
+            printf("\nParabens, voce acertou a palavra: %s!\n", registro->palavras[0]);
+
             break;
         }
 
         jogador_atual = (jogador_atual + 1) % MAX_PLAYERS;
         }
+        
+        printf("\nFim de jogo!\n");
+        int vencedor = 0;
+        for(int i = 1; i<MAX_PLAYERS; i++){
+            if(saldo[i] > saldo[vencedor]){
+                vencedor = i;
+            }
+        }
+        printf("O vencedor foi o jogador %d com R$%.2f.\n", vencedor + 1, saldo[vencedor]);
 }
